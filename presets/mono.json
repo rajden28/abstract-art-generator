@@ -1,0 +1,7 @@
+{
+  "palette": ["#F2F2F2", "#1A1A1A"],
+  "background": "#F2F2F2",
+  "rotation": "random",
+  "decorations": { "enabled": false, "probability": 0, "types": ["dot"] },
+  "padding": 4
+}

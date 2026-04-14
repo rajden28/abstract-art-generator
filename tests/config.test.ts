@@ -55,3 +55,20 @@ describe("mergeConfig", () => {
     expect(merged.shapes.square.weight).toBe(defaultConfig.shapes.square.weight);
   });
 });
+
+describe("background-in-palette refinement", () => {
+  it("accepts background='auto'", () => {
+    const r = ConfigSchema.safeParse({ ...defaultConfig, background: "auto" });
+    expect(r.success).toBe(true);
+  });
+
+  it("accepts a fixed background that is in the palette", () => {
+    const r = ConfigSchema.safeParse({ ...defaultConfig, background: defaultConfig.palette[0] });
+    expect(r.success).toBe(true);
+  });
+
+  it("rejects a fixed background not in the palette", () => {
+    const r = ConfigSchema.safeParse({ ...defaultConfig, background: "#ff00aa" });
+    expect(r.success).toBe(false);
+  });
+});

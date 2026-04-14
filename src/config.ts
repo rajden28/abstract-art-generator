@@ -39,16 +39,28 @@ const DecorationsSchema = z.object({
   types: z.array(z.enum(["plus", "dot"])).min(1),
 });
 
-export const ConfigSchema = z.object({
-  resolution: z.number().int().positive(),
-  seed: z.number().int().nullable(),
-  palette: z.array(hex).min(2),
-  background: z.union([z.literal("auto"), hex]),
-  shapes: ShapesSchema,
-  rotation: RotationSchema,
-  decorations: DecorationsSchema,
-  padding: z.number().min(0),
-});
+export const ConfigSchema = z
+  .object({
+    resolution: z.number().int().positive(),
+    seed: z.number().int().nullable(),
+    palette: z.array(hex).min(2),
+    background: z.union([z.literal("auto"), hex]),
+    shapes: ShapesSchema,
+    rotation: RotationSchema,
+    decorations: DecorationsSchema,
+    padding: z.number().min(0),
+  })
+  .superRefine((cfg, ctx) => {
+    if (cfg.background === "auto") return;
+    const lc = cfg.background.toLowerCase();
+    if (!cfg.palette.some((c) => c.toLowerCase() === lc)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["background"],
+        message: "background hex must be present in palette or set to 'auto'",
+      });
+    }
+  });
 
 export type Config = z.infer<typeof ConfigSchema>;
 

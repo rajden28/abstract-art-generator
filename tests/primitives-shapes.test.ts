@@ -29,3 +29,23 @@ describe("primitives", () => {
     expect(svg.length).toBeGreaterThan(0);
   });
 });
+
+describe("padding", () => {
+  it("square insets by padding on both axes", () => {
+    const svg = square.render({ fg: "#111", bg: "#eee", rng: createRng(1), padding: 10 });
+    expect(svg).toContain(`x="10"`);
+    expect(svg).toContain(`width="80"`);
+  });
+
+  it("arch shrinks vertically when padded", () => {
+    const a = arch.render({ fg: "#111", bg: "#eee", rng: createRng(1), padding: 0 });
+    const b = arch.render({ fg: "#111", bg: "#eee", rng: createRng(1), padding: 10 });
+    expect(a).not.toBe(b);
+  });
+
+  it("plus arms shorten when padded", () => {
+    const a = plus.render({ fg: "#111", bg: "#eee", rng: createRng(1), padding: 0 });
+    const b = plus.render({ fg: "#111", bg: "#eee", rng: createRng(1), padding: 10 });
+    expect(a).not.toBe(b);
+  });
+});

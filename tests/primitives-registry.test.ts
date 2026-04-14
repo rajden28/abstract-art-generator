@@ -36,3 +36,26 @@ describe("sampleByWeight", () => {
     expect(aCount / N).toBeLessThan(0.3);
   });
 });
+
+import { bootstrapPrimitives, allPrimitives } from "../src/primitives/index.js";
+
+describe("bootstrapPrimitives", () => {
+  it("registers the 10 built-in primitives", () => {
+    bootstrapPrimitives();
+    const names = allPrimitives().map((p) => p.name).sort();
+    expect(names).toEqual(
+      [
+        "arch",
+        "circle",
+        "concentricArches",
+        "dot",
+        "halfCircle",
+        "leaf",
+        "plus",
+        "quarterCircle",
+        "quarterRound",
+        "square",
+      ].sort()
+    );
+  });
+});

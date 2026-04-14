@@ -1,0 +1,31 @@
+import { describe, it, expect } from "vitest";
+import { createRng } from "../src/rng.js";
+import { halfCircle } from "../src/primitives/halfCircle.js";
+import { quarterCircle } from "../src/primitives/quarterCircle.js";
+import { leaf } from "../src/primitives/leaf.js";
+import { arch } from "../src/primitives/arch.js";
+import { concentricArches } from "../src/primitives/concentricArches.js";
+import { quarterRound } from "../src/primitives/quarterRound.js";
+import { dot } from "../src/primitives/dot.js";
+import { plus } from "../src/primitives/plus.js";
+import { square } from "../src/primitives/square.js";
+
+const prims = [halfCircle, quarterCircle, leaf, arch, concentricArches, quarterRound, dot, plus, square];
+
+describe("primitives", () => {
+  it.each(prims.map((p) => [p.name, p]))("%s is deterministic", (_name, p) => {
+    const a = p.render({ fg: "#111", bg: "#eee", rng: createRng(5), padding: 0 });
+    const b = p.render({ fg: "#111", bg: "#eee", rng: createRng(5), padding: 0 });
+    expect(a).toBe(b);
+  });
+
+  it.each(prims.map((p) => [p.name, p]))("%s output contains the foreground color", (_name, p) => {
+    const svg = p.render({ fg: "#abcdef", bg: "#000", rng: createRng(5), padding: 0 });
+    expect(svg.toLowerCase()).toContain("#abcdef");
+  });
+
+  it.each(prims.map((p) => [p.name, p]))("%s output is non-empty", (_name, p) => {
+    const svg = p.render({ fg: "#abcdef", bg: "#000", rng: createRng(5), padding: 0 });
+    expect(svg.length).toBeGreaterThan(0);
+  });
+});

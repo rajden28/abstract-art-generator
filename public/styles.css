@@ -1,0 +1,26 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: #111; color: #eee; }
+body { display: grid; grid-template-columns: 320px 1fr; }
+#controls { padding: 16px; background: #1a1a1a; overflow-y: auto; height: 100vh; }
+#controls h1 { font-size: 18px; margin: 0 0 12px; }
+#controls label { display: block; margin: 8px 0; font-size: 13px; }
+#controls input[type=number], #controls select { width: 100%; padding: 4px 6px; background: #222; color: #eee; border: 1px solid #333; }
+#controls fieldset { border: 1px solid #333; margin: 12px 0; padding: 8px; }
+#controls legend { font-size: 12px; text-transform: uppercase; color: #aaa; }
+#controls .row { display: flex; gap: 6px; align-items: center; }
+#controls button { padding: 6px 10px; background: #333; color: #eee; border: 1px solid #444; cursor: pointer; }
+#controls button:hover { background: #444; }
+#palette { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+#palette .swatch { display: flex; gap: 2px; }
+#palette input[type=color] { width: 32px; height: 32px; padding: 0; border: none; background: none; }
+#palette .remove { padding: 2px 6px; }
+#shapes .shape-row { display: flex; align-items: center; gap: 8px; margin: 2px 0; font-size: 12px; }
+#shapes .shape-row span { flex: 0 0 110px; }
+#shapes .shape-row input { flex: 1; }
+
+main { padding: 16px; overflow-y: auto; height: 100vh; }
+#preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.tile { background: #000; border: 1px solid #222; padding: 8px; }
+.tile svg { width: 100%; height: auto; display: block; }
+.tile .meta { margin-top: 6px; font-size: 11px; display: flex; justify-content: space-between; color: #888; }
+.tile .meta button { padding: 2px 6px; font-size: 11px; }

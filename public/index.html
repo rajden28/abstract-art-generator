@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Abstract Art Generator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <aside id="controls">
+      <h1>Art Generator</h1>
+
+      <label>Preset
+        <select id="preset"><option value="">(none)</option></select>
+      </label>
+
+      <label>Resolution
+        <input type="number" id="resolution" min="64" max="4096" value="1024" />
+      </label>
+
+      <label>Seed
+        <span class="row">
+          <input type="number" id="seed" placeholder="(random)" />
+          <button type="button" id="randomize">random</button>
+        </span>
+      </label>
+
+      <label>Count
+        <input type="number" id="count" min="1" max="50" value="6" />
+      </label>
+
+      <fieldset>
+        <legend>Palette</legend>
+        <div id="palette"></div>
+        <button type="button" id="add-color">+ Add color</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Shapes</legend>
+        <div id="shapes"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Rotation</legend>
+        <label><input type="radio" name="rot" value="random" checked /> Random</label>
+        <label><input type="radio" name="rot" value="fixed" /> Fixed (0°)</label>
+        <label><input type="radio" name="rot" value="custom" /> Custom</label>
+        <div id="rot-custom" hidden>
+          <label><input type="checkbox" class="rot-angle" value="0" checked /> 0°</label>
+          <label><input type="checkbox" class="rot-angle" value="90" checked /> 90°</label>
+          <label><input type="checkbox" class="rot-angle" value="180" /> 180°</label>
+          <label><input type="checkbox" class="rot-angle" value="270" /> 270°</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Decorations</legend>
+        <label><input type="checkbox" id="deco-enabled" checked /> Enabled</label>
+        <label>Probability <input type="range" id="deco-prob" min="0" max="1" step="0.05" value="0.2" /></label>
+      </fieldset>
+
+      <div class="row">
+        <button type="button" id="generate">Generate</button>
+        <button type="button" id="open-output">Open folder</button>
+      </div>
+    </aside>
+
+    <main id="preview"></main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

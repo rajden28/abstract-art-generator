@@ -182,6 +182,7 @@ function renderSymmetry(
   ctx: ComposeContext,
   strategy: SymmetryStrategy,
   excludeColors: readonly string[],
+  forceFacingOut = false,
 ): SymmetryRender | null {
   const candidates = allPrimitives().filter(isSymmetry);
   const weights = weightsFromConfig(ctx.cfg);
@@ -198,7 +199,7 @@ function renderSymmetry(
   let popColor: string | null = null;
 
   if (strategy === "four-corner") {
-    const facingOut = ctx.rng() < 0.5;
+    const facingOut = forceFacingOut || ctx.rng() < 0.5;
     if (facingOut) {
       placements = [[0, 0, 0], [100, 0, 90], [100, 100, 180], [0, 100, 270]];
     } else {
@@ -242,13 +243,13 @@ function composeLayered(ctx: ComposeContext): ComposeResult {
   if (!bdColor) return composeSingle(ctx);
   const bdInner = backdrop.render({ fg: bdColor, bg: ctx.primaryBg, rng: ctx.rng, padding: ctx.cfg.padding });
 
-  const subModes = ["four-corner", "opposite-pair", "halfCircle"] as const;
+  const subModes = ["four-corner", "halfCircle"] as const;
   const sub = pick(ctx.rng, subModes);
   const exclude = [...ctx.bgColors, bdColor];
 
   let fgInner = "";
-  if (sub === "four-corner" || sub === "opposite-pair") {
-    const result = renderSymmetry(ctx, sub, exclude);
+  if (sub === "four-corner") {
+    const result = renderSymmetry(ctx, "four-corner", exclude, true);
     if (!result) return { inner: bdInner, strategy: "layered", primaryFg: bdColor, acceptsDecorations: false };
     fgInner = result.inner;
   } else {

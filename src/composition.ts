@@ -174,8 +174,10 @@ function composeHeroAccent(ctx: ComposeContext): ComposeResult {
     const raw = ap.render({ fg: afg, bg: ctx.primaryBg, rng: ctx.rng, padding: ctx.cfg.padding });
     accentParts.push(placeAccent(raw, aanchor));
   }
+  const combined = heroInner + accentParts.join("");
+  const padded = PADDED_HERO_NAMES.has(hero.prim.name) ? withTilePadding(combined, TILE_PADDING) : combined;
   return {
-    inner: heroInner + accentParts.join(""),
+    inner: padded,
     strategy: "hero-accent",
     primaryFg: hero.fg,
     acceptsDecorations: false,

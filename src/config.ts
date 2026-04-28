@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { readFile } from "node:fs/promises";
 
 const HEX = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 const hex = z.string().regex(HEX, "must be a hex color like #RRGGBB");
@@ -7,14 +6,12 @@ const hex = z.string().regex(HEX, "must be a hex color like #RRGGBB");
 const ShapeKeys = [
   "circle",
   "halfCircle",
-  "quarterCircle",
   "leaf",
   "arch",
-  "concentricArches",
+  "concentricBands",
   "quarterRound",
   "dot",
   "plus",
-  "square",
 ] as const;
 export type ShapeKey = (typeof ShapeKeys)[number];
 
@@ -39,19 +36,43 @@ const DecorationsSchema = z.object({
   types: z.array(z.enum(["plus", "dot"])).min(1),
 });
 
+const AnchorSchema = z.enum([
+  "center",
+  "top-left", "top", "top-right",
+  "left", "right",
+  "bottom-left", "bottom", "bottom-right",
+]);
+export type Anchor = z.infer<typeof AnchorSchema>;
+
+const CompositionSchema = z.object({
+  weights: z.object({
+    "single": z.number().min(0),
+    "hero-accent": z.number().min(0),
+    "four-corner": z.number().min(0),
+    "opposite-pair": z.number().min(0),
+  }),
+});
+
 export const ConfigSchema = z
   .object({
     resolution: z.number().int().positive(),
     seed: z.number().int().nullable(),
     palette: z.array(hex).min(2),
-    background: z.union([z.literal("auto"), hex]),
+    background: z.union([
+      z.literal("auto"),
+      z.literal("random"),
+      z.literal("split-h"),
+      z.literal("split-v"),
+      hex,
+    ]),
     shapes: ShapesSchema,
     rotation: RotationSchema,
     decorations: DecorationsSchema,
     padding: z.number().min(0),
+    composition: CompositionSchema,
   })
   .superRefine((cfg, ctx) => {
-    if (cfg.background === "auto") return;
+    if (cfg.background === "auto" || cfg.background === "random" || cfg.background === "split-h" || cfg.background === "split-v") return;
     const lc = cfg.background.toLowerCase();
     if (!cfg.palette.some((c) => c.toLowerCase() === lc)) {
       ctx.addIssue({
@@ -72,18 +93,24 @@ export const defaultConfig: Config = {
   shapes: {
     circle: { weight: 1 },
     halfCircle: { weight: 1 },
-    quarterCircle: { weight: 1 },
     leaf: { weight: 1 },
     arch: { weight: 1 },
-    concentricArches: { weight: 0.5 },
+    concentricBands: { weight: 0.5 },
     quarterRound: { weight: 1 },
     dot: { weight: 0.3 },
     plus: { weight: 0.3 },
-    square: { weight: 0.5 },
   },
   rotation: "random",
   decorations: { enabled: true, probability: 0.2, types: ["plus", "dot"] },
   padding: 0,
+  composition: {
+    weights: {
+      "single": 3,
+      "hero-accent": 2,
+      "four-corner": 1,
+      "opposite-pair": 1,
+    },
+  },
 };
 
 export type PartialConfig = Partial<Omit<Config, "shapes" | "decorations">> & {
@@ -124,7 +151,3 @@ function stripUndefined<T extends object>(o: T): Partial<T> {
   return r;
 }
 
-export async function loadJsonFile(path: string): Promise<unknown> {
-  const text = await readFile(path, "utf8");
-  return JSON.parse(text);
-}

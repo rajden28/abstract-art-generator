@@ -1,16 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { createRng } from "../src/rng.js";
 import { halfCircle } from "../src/primitives/halfCircle.js";
-import { quarterCircle } from "../src/primitives/quarterCircle.js";
 import { leaf } from "../src/primitives/leaf.js";
 import { arch } from "../src/primitives/arch.js";
-import { concentricArches } from "../src/primitives/concentricArches.js";
+import { concentricBands } from "../src/primitives/concentricBands.js";
 import { quarterRound } from "../src/primitives/quarterRound.js";
 import { dot } from "../src/primitives/dot.js";
 import { plus } from "../src/primitives/plus.js";
-import { square } from "../src/primitives/square.js";
 
-const prims = [halfCircle, quarterCircle, leaf, arch, concentricArches, quarterRound, dot, plus, square];
+const prims = [halfCircle, leaf, arch, concentricBands, quarterRound, dot, plus];
 
 describe("primitives", () => {
   it.each(prims.map((p) => [p.name, p]))("%s is deterministic", (_name, p) => {
@@ -31,12 +29,6 @@ describe("primitives", () => {
 });
 
 describe("padding", () => {
-  it("square insets by padding on both axes", () => {
-    const svg = square.render({ fg: "#111", bg: "#eee", rng: createRng(1), padding: 10 });
-    expect(svg).toContain(`x="10"`);
-    expect(svg).toContain(`width="80"`);
-  });
-
   it("arch shrinks vertically when padded", () => {
     const a = arch.render({ fg: "#111", bg: "#eee", rng: createRng(1), padding: 0 });
     const b = arch.render({ fg: "#111", bg: "#eee", rng: createRng(1), padding: 10 });

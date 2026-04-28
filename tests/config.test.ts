@@ -52,11 +52,21 @@ describe("mergeConfig", () => {
       {}
     );
     expect(merged.shapes.circle.weight).toBe(5);
-    expect(merged.shapes.square.weight).toBe(defaultConfig.shapes.square.weight);
+    expect(merged.shapes.leaf.weight).toBe(defaultConfig.shapes.leaf.weight);
   });
 });
 
 describe("background-in-palette refinement", () => {
+  it("accepts background='split-h'", () => {
+    const r = ConfigSchema.safeParse({ ...defaultConfig, background: "split-h" });
+    expect(r.success).toBe(true);
+  });
+
+  it("accepts background='split-v'", () => {
+    const r = ConfigSchema.safeParse({ ...defaultConfig, background: "split-v" });
+    expect(r.success).toBe(true);
+  });
+
   it("accepts background='auto'", () => {
     const r = ConfigSchema.safeParse({ ...defaultConfig, background: "auto" });
     expect(r.success).toBe(true);

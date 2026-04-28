@@ -40,21 +40,19 @@ describe("sampleByWeight", () => {
 import { bootstrapPrimitives, allPrimitives } from "../src/primitives/index.js";
 
 describe("bootstrapPrimitives", () => {
-  it("registers the 10 built-in primitives", () => {
+  it("registers the 8 built-in primitives", () => {
     bootstrapPrimitives();
     const names = allPrimitives().map((p) => p.name).sort();
     expect(names).toEqual(
       [
         "arch",
         "circle",
-        "concentricArches",
+        "concentricBands",
         "dot",
         "halfCircle",
         "leaf",
         "plus",
-        "quarterCircle",
         "quarterRound",
-        "square",
       ].sort()
     );
   });

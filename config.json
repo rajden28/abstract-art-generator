@@ -6,14 +6,12 @@
   "shapes": {
     "circle": { "weight": 1 },
     "halfCircle": { "weight": 1 },
-    "quarterCircle": { "weight": 1 },
     "leaf": { "weight": 1 },
     "arch": { "weight": 1 },
-    "concentricArches": { "weight": 0.5 },
+    "concentricBands": { "weight": 0.5 },
     "quarterRound": { "weight": 1 },
     "dot": { "weight": 0.3 },
-    "plus": { "weight": 0.3 },
-    "square": { "weight": 0.5 }
+    "plus": { "weight": 0.3 }
   },
   "rotation": "random",
   "decorations": { "enabled": true, "probability": 0.2, "types": ["plus", "dot"] },

@@ -11,5 +11,5 @@ export function renderDecoration(type: DecorationType, color: string): string {
       `<rect x="${cx - armL}" y="${cy - armW / 2}" width="${armL * 2}" height="${armW}" fill="${color}" />`,
     ].join("");
   }
-  return `<circle cx="50" cy="50" r="3" fill="${color}" />`;
+  return `<circle cx="50" cy="50" r="6" fill="${color}" />`;
 }

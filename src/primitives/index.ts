@@ -38,20 +38,18 @@ export function sampleByWeight(
 
 import { circle } from "./circle.js";
 import { halfCircle } from "./halfCircle.js";
-import { quarterCircle } from "./quarterCircle.js";
 import { leaf } from "./leaf.js";
 import { arch } from "./arch.js";
-import { concentricArches } from "./concentricArches.js";
+import { concentricBands } from "./concentricBands.js";
 import { quarterRound } from "./quarterRound.js";
 import { dot } from "./dot.js";
 import { plus } from "./plus.js";
-import { square as squarePrim } from "./square.js";
 
 let bootstrapped = false;
 export function bootstrapPrimitives(): void {
   if (bootstrapped) return;
   bootstrapped = true;
-  for (const p of [circle, halfCircle, quarterCircle, leaf, arch, concentricArches, quarterRound, dot, plus, squarePrim]) {
+  for (const p of [circle, halfCircle, leaf, arch, concentricBands, quarterRound, dot, plus]) {
     register(p);
   }
 }

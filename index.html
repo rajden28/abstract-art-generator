@@ -40,6 +40,14 @@
       </fieldset>
 
       <fieldset>
+        <legend>Background</legend>
+        <label><input type="radio" name="bg" value="auto" checked /> Auto (solid)</label>
+        <label><input type="radio" name="bg" value="split-h" /> Split horizontal</label>
+        <label><input type="radio" name="bg" value="split-v" /> Split vertical</label>
+        <label><input type="radio" name="bg" value="random" /> Random</label>
+      </fieldset>
+
+      <fieldset>
         <legend>Rotation</legend>
         <label><input type="radio" name="rot" value="random" checked /> Random</label>
         <label><input type="radio" name="rot" value="fixed" /> Fixed (0°)</label>
@@ -53,6 +61,14 @@
       </fieldset>
 
       <fieldset>
+        <legend>Composition</legend>
+        <label>Single <input type="range" class="comp-weight" data-key="single" min="0" max="5" step="0.5" value="3" /><span class="comp-val" data-key="single">3</span></label>
+        <label>Hero + accent <input type="range" class="comp-weight" data-key="hero-accent" min="0" max="5" step="0.5" value="2" /><span class="comp-val" data-key="hero-accent">2</span></label>
+        <label>Four corner <input type="range" class="comp-weight" data-key="four-corner" min="0" max="5" step="0.5" value="1" /><span class="comp-val" data-key="four-corner">1</span></label>
+        <label>Opposite pair <input type="range" class="comp-weight" data-key="opposite-pair" min="0" max="5" step="0.5" value="1" /><span class="comp-val" data-key="opposite-pair">1</span></label>
+      </fieldset>
+
+      <fieldset>
         <legend>Decorations</legend>
         <label><input type="checkbox" id="deco-enabled" checked /> Enabled</label>
         <label>Probability <input type="range" id="deco-prob" min="0" max="1" step="0.05" value="0.2" /></label>
@@ -60,12 +76,13 @@
 
       <div class="row">
         <button type="button" id="generate">Generate</button>
-        <button type="button" id="open-output">Open folder</button>
+        <button type="button" id="download-zip">Download ZIP</button>
+        <button type="button" id="download-html">Download HTML</button>
       </div>
     </aside>
 
     <main id="preview"></main>
 
-    <script src="app.js"></script>
+    <script type="module" src="/app.js"></script>
   </body>
 </html>

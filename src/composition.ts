@@ -24,6 +24,8 @@ const SYMMETRY_NAMES = ["leaf"] as const;
 const ACCENT_SCALE = 0.15;
 const SYMMETRY_SCALE = 0.5;
 const COLOR_POP_PROBABILITY = 0.35;
+const TILE_PADDING = 6;
+const PADDED_HERO_NAMES = new Set(["circle", "halfCircle"]);
 
 const isAccent = (p: Primitive) => (ACCENT_NAMES as readonly string[]).includes(p.name);
 const isSymmetry = (p: Primitive) => (SYMMETRY_NAMES as readonly string[]).includes(p.name);
@@ -73,6 +75,12 @@ export function placeAccent(inner: string, anchor: Anchor, scale: number = ACCEN
   const x = ax * (100 - size);
   const y = ay * (100 - size);
   return `<g transform="translate(${x} ${y}) scale(${scale})">${inner}</g>`;
+}
+
+function withTilePadding(inner: string, padding: number): string {
+  if (padding <= 0) return inner;
+  const scale = (100 - 2 * padding) / 100;
+  return `<g transform="translate(${padding} ${padding}) scale(${scale})">${inner}</g>`;
 }
 
 function placeAtCorner(inner: string, cx: number, cy: number, scale: number, rotateDeg: number): string {
@@ -140,7 +148,8 @@ function pickHero(ctx: ComposeContext, exclude: readonly string[] = ctx.bgColors
 function composeSingle(ctx: ComposeContext): ComposeResult {
   const hero = pickHero(ctx);
   if (!hero) throw new Error("No hero primitive available (all weights zero or only accent shapes enabled)");
-  const inner = hero.prim.render({ fg: hero.fg, bg: ctx.primaryBg, rng: ctx.rng, padding: ctx.cfg.padding });
+  let inner = hero.prim.render({ fg: hero.fg, bg: ctx.primaryBg, rng: ctx.rng, padding: ctx.cfg.padding });
+  if (PADDED_HERO_NAMES.has(hero.prim.name)) inner = withTilePadding(inner, TILE_PADDING);
   return { inner, strategy: "single", primaryFg: hero.fg, acceptsDecorations: hero.prim.acceptsDecorations };
 }
 
@@ -230,7 +239,7 @@ function renderSymmetry(
 function composeSymmetry(ctx: ComposeContext, strategy: SymmetryStrategy): ComposeResult {
   const result = renderSymmetry(ctx, strategy, ctx.bgColors);
   if (!result) return composeSingle(ctx);
-  return { inner: result.inner, strategy, primaryFg: result.fg, acceptsDecorations: false };
+  return { inner: withTilePadding(result.inner, TILE_PADDING), strategy, primaryFg: result.fg, acceptsDecorations: false };
 }
 
 function composeLayered(ctx: ComposeContext): ComposeResult {

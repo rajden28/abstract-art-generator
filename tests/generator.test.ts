@@ -64,21 +64,4 @@ describe("generator", () => {
     expect(tiles.map((t) => t.seed)).toEqual([100, 101, 102, 103, 104]);
   });
 
-  it("does not apply decorations to primitives that don't accept them", () => {
-    const zeroed = Object.fromEntries(
-      Object.keys(defaultConfig.shapes).map((k) => [k, { weight: 0 }])
-    ) as typeof defaultConfig.shapes;
-    const cfg = {
-      ...defaultConfig,
-      shapes: { ...zeroed, halfCircle: { weight: 1 } },
-      decorations: { enabled: true, probability: 1, types: ["plus", "dot"] as const },
-    };
-    for (let s = 1; s < 20; s++) {
-      const svg = generateTile(cfg, s).svg;
-      const circleCount = (svg.match(/<circle/g) ?? []).length;
-      const rectCount = (svg.match(/<rect/g) ?? []).length;
-      expect(circleCount).toBe(0);
-      expect(rectCount).toBe(1);
-    }
-  });
 });

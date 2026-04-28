@@ -15,7 +15,4 @@ describe("circle primitive", () => {
     expect(svg).toContain('fill="#abcdef"');
   });
 
-  it("accepts decorations", () => {
-    expect(circle.acceptsDecorations).toBe(true);
-  });
 });

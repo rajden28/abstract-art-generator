@@ -97,7 +97,6 @@ function loadPresets() {
     const preset = PRESETS[sel.value];
     Object.assign(state, { ...DEFAULT_CFG, ...preset,
       shapes: { ...DEFAULT_CFG.shapes, ...(preset.shapes || {}) },
-      decorations: { ...DEFAULT_CFG.decorations, ...(preset.decorations || {}) },
     });
     syncFormFromState();
   };
@@ -106,8 +105,6 @@ function loadPresets() {
 function syncFormFromState() {
   el("resolution").value = state.resolution;
   el("seed").value = state.seed ?? "";
-  el("deco-enabled").checked = state.decorations.enabled;
-  el("deco-prob").value = state.decorations.probability;
   renderPalette();
   renderShapes();
   document.querySelectorAll(".comp-weight").forEach((s) => {
@@ -140,11 +137,6 @@ function buildConfig() {
     background: readBackground(),
     rotation: readRotation(),
     composition: readComposition(),
-    decorations: {
-      ...state.decorations,
-      enabled: el("deco-enabled").checked,
-      probability: Number(el("deco-prob").value),
-    },
   };
 }
 

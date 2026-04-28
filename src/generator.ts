@@ -2,8 +2,7 @@ import type { Config } from "./config.js";
 import { createRng, randomSeed, pick } from "./rng.js";
 import { bootstrapPrimitives } from "./primitives/index.js";
 import { renderTile, type Background } from "./renderer.js";
-import { renderDecoration, type DecorationType } from "./decorations/index.js";
-import { compose, placeAccent, pickAccentAnchor } from "./composition.js";
+import { compose } from "./composition.js";
 
 export interface GeneratedTile {
   svg: string;
@@ -36,13 +35,6 @@ function pickBackground(cfg: Config, rng: () => number): Background {
   return { mode: "solid", color };
 }
 
-function pickDecorationColor(palette: readonly string[], exclude: string[], rng: () => number): string {
-  const ex = new Set(exclude.map((c) => c.toLowerCase()));
-  const options = palette.filter((c) => !ex.has(c.toLowerCase()));
-  if (options.length === 0) throw new Error("Palette has no color distinct from background and primary foreground");
-  return pick(rng, options);
-}
-
 export function generateTile(cfg: Config, seedOverride?: number): GeneratedTile {
   bootstrapPrimitives();
   const seed = seedOverride ?? cfg.seed ?? randomSeed();
@@ -54,20 +46,7 @@ export function generateTile(cfg: Config, seedOverride?: number): GeneratedTile 
   const rotation = pickRotation(cfg, rng);
 
   const result = compose({ cfg, rng, bgColors, primaryBg });
-  let inner = result.inner;
-
-  if (
-    result.acceptsDecorations &&
-    cfg.decorations.enabled &&
-    rng() < cfg.decorations.probability
-  ) {
-    const deco = pick(rng, cfg.decorations.types) as DecorationType;
-    const decoColor = pickDecorationColor(cfg.palette, [...bgColors, result.primaryFg], rng);
-    const decoAnchor = pickAccentAnchor(rng);
-    inner += placeAccent(renderDecoration(deco, decoColor), decoAnchor);
-  }
-
-  const svg = renderTile({ resolution: cfg.resolution, background: bg, rotation, inner });
+  const svg = renderTile({ resolution: cfg.resolution, background: bg, rotation, inner: result.inner });
   return { svg, seed };
 }
 

@@ -2,6 +2,5 @@
   "palette": ["#C4402E", "#1A1A1A", "#E8D4A8"],
   "background": "auto",
   "rotation": "random",
-  "decorations": { "enabled": true, "probability": 0.25, "types": ["plus", "dot"] },
   "padding": 0
 }

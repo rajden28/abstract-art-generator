@@ -10,6 +10,5 @@ export interface RenderContext {
 export interface Primitive {
   name: string;
   defaultWeight: number;
-  acceptsDecorations: boolean;
   render(ctx: RenderContext): string;
 }

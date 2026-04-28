@@ -30,12 +30,6 @@ const RotationSchema = z.union([
   z.array(z.union([z.literal(0), z.literal(90), z.literal(180), z.literal(270)])).min(1),
 ]);
 
-const DecorationsSchema = z.object({
-  enabled: z.boolean(),
-  probability: z.number().min(0).max(1),
-  types: z.array(z.enum(["plus", "dot"])).min(1),
-});
-
 const AnchorSchema = z.enum([
   "center",
   "top-left", "top", "top-right",
@@ -68,7 +62,6 @@ export const ConfigSchema = z
     ]),
     shapes: ShapesSchema,
     rotation: RotationSchema,
-    decorations: DecorationsSchema,
     padding: z.number().min(0),
     composition: CompositionSchema,
   })
@@ -102,7 +95,6 @@ export const defaultConfig: Config = {
     plus: { weight: 0.3 },
   },
   rotation: "random",
-  decorations: { enabled: true, probability: 0.2, types: ["plus", "dot"] },
   padding: 0,
   composition: {
     weights: {
@@ -115,9 +107,8 @@ export const defaultConfig: Config = {
   },
 };
 
-export type PartialConfig = Partial<Omit<Config, "shapes" | "decorations">> & {
+export type PartialConfig = Partial<Omit<Config, "shapes">> & {
   shapes?: Partial<Record<ShapeKey, { weight: number }>>;
-  decorations?: Partial<Config["decorations"]>;
 };
 
 export function mergeConfig(
@@ -130,7 +121,6 @@ export function mergeConfig(
     ...stripUndefined(preset),
     ...stripUndefined(overrides),
     shapes: { ...base.shapes },
-    decorations: { ...base.decorations },
   };
   for (const src of [preset.shapes, overrides.shapes]) {
     if (!src) continue;
@@ -138,18 +128,13 @@ export function mergeConfig(
       if (v) out.shapes[k as ShapeKey] = v;
     }
   }
-  for (const src of [preset.decorations, overrides.decorations]) {
-    if (!src) continue;
-    out.decorations = { ...out.decorations, ...src };
-  }
   return ConfigSchema.parse(out);
 }
 
 function stripUndefined<T extends object>(o: T): Partial<T> {
   const r: Partial<T> = {};
   for (const k of Object.keys(o) as (keyof T)[]) {
-    if (o[k] !== undefined && k !== "shapes" && k !== "decorations") r[k] = o[k];
+    if (o[k] !== undefined && k !== "shapes") r[k] = o[k];
   }
   return r;
 }
-

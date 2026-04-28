@@ -5,7 +5,6 @@ import type { Primitive } from "../src/primitives/types.js";
 const mkPrim = (name: string): Primitive => ({
   name,
   defaultWeight: 1,
-  acceptsDecorations: false,
   render: () => "",
 });
 

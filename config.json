@@ -14,6 +14,5 @@
     "plus": { "weight": 0.3 }
   },
   "rotation": "random",
-  "decorations": { "enabled": true, "probability": 0.2, "types": ["plus", "dot"] },
   "padding": 0
 }

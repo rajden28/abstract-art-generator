@@ -120,7 +120,6 @@ export interface ComposeResult {
   inner: string;
   strategy: Strategy;
   primaryFg: string;
-  acceptsDecorations: boolean;
 }
 
 export function pickStrategy(cfg: Config, rng: Rng): Strategy {
@@ -150,7 +149,7 @@ function composeSingle(ctx: ComposeContext): ComposeResult {
   if (!hero) throw new Error("No hero primitive available (all weights zero or only accent shapes enabled)");
   let inner = hero.prim.render({ fg: hero.fg, bg: ctx.primaryBg, rng: ctx.rng, padding: ctx.cfg.padding });
   if (PADDED_HERO_NAMES.has(hero.prim.name)) inner = withTilePadding(inner, TILE_PADDING);
-  return { inner, strategy: "single", primaryFg: hero.fg, acceptsDecorations: hero.prim.acceptsDecorations };
+  return { inner, strategy: "single", primaryFg: hero.fg };
 }
 
 function composeHeroAccent(ctx: ComposeContext): ComposeResult {
@@ -180,7 +179,6 @@ function composeHeroAccent(ctx: ComposeContext): ComposeResult {
     inner: padded,
     strategy: "hero-accent",
     primaryFg: hero.fg,
-    acceptsDecorations: false,
   };
 }
 
@@ -241,7 +239,7 @@ function renderSymmetry(
 function composeSymmetry(ctx: ComposeContext, strategy: SymmetryStrategy): ComposeResult {
   const result = renderSymmetry(ctx, strategy, ctx.bgColors);
   if (!result) return composeSingle(ctx);
-  return { inner: withTilePadding(result.inner, TILE_PADDING), strategy, primaryFg: result.fg, acceptsDecorations: false };
+  return { inner: withTilePadding(result.inner, TILE_PADDING), strategy, primaryFg: result.fg };
 }
 
 function composeLayered(ctx: ComposeContext): ComposeResult {
@@ -261,7 +259,7 @@ function composeLayered(ctx: ComposeContext): ComposeResult {
   let fgInner = "";
   if (sub === "four-corner") {
     const result = renderSymmetry(ctx, "four-corner", exclude, true);
-    if (!result) return { inner: bdInner, strategy: "layered", primaryFg: bdColor, acceptsDecorations: false };
+    if (!result) return { inner: bdInner, strategy: "layered", primaryFg: bdColor };
     fgInner = result.inner;
   } else {
     const hc = findPrimitive("halfCircle");
@@ -277,7 +275,6 @@ function composeLayered(ctx: ComposeContext): ComposeResult {
     inner: withTilePadding(bdInner + fgInner, TILE_PADDING),
     strategy: "layered",
     primaryFg: bdColor,
-    acceptsDecorations: false,
   };
 }
 

@@ -3,7 +3,6 @@ import type { Primitive } from "./types.js";
 export const arch: Primitive = {
   name: "arch",
   defaultWeight: 1,
-  acceptsDecorations: false,
   render({ fg, padding: p }) {
     const x = 25 + p / 2;
     const w = 50 - p;

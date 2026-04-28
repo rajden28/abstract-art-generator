@@ -3,7 +3,6 @@ import type { Primitive } from "./types.js";
 export const plus: Primitive = {
   name: "plus",
   defaultWeight: 0.3,
-  acceptsDecorations: false,
   render({ fg, padding: p }) {
     const armW = 8;
     const armL = 40 - p;

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { generateTile } from "../src/generator.js";
 import { defaultConfig } from "../src/config.js";
 
-function only(strategy: "single" | "hero-accent" | "four-corner" | "opposite-pair") {
+function only(strategy: "single" | "hero-accent" | "four-corner" | "opposite-pair" | "layered") {
   return {
     ...defaultConfig,
     composition: {
@@ -11,6 +11,7 @@ function only(strategy: "single" | "hero-accent" | "four-corner" | "opposite-pai
         "hero-accent": strategy === "hero-accent" ? 1 : 0,
         "four-corner": strategy === "four-corner" ? 1 : 0,
         "opposite-pair": strategy === "opposite-pair" ? 1 : 0,
+        "layered": strategy === "layered" ? 1 : 0,
       },
     },
   };

@@ -3,8 +3,9 @@ import { allPrimitives, sampleByWeight } from "./primitives/index.js";
 import type { Primitive } from "./primitives/types.js";
 import { pick, type Rng } from "./rng.js";
 
-export const STRATEGIES = ["single", "hero-accent", "four-corner", "opposite-pair"] as const;
+export const STRATEGIES = ["single", "hero-accent", "four-corner", "opposite-pair", "layered"] as const;
 export type Strategy = (typeof STRATEGIES)[number];
+export type SymmetryStrategy = "four-corner" | "opposite-pair";
 
 const ACCENT_ANCHORS: readonly Anchor[] = [
   "top-left", "top-right",
@@ -22,6 +23,7 @@ const ACCENT_NAMES = ["dot", "plus"] as const;
 const SYMMETRY_NAMES = ["leaf"] as const;
 const ACCENT_SCALE = 0.15;
 const SYMMETRY_SCALE = 0.5;
+const COLOR_POP_PROBABILITY = 0.35;
 
 const isAccent = (p: Primitive) => (ACCENT_NAMES as readonly string[]).includes(p.name);
 const isSymmetry = (p: Primitive) => (SYMMETRY_NAMES as readonly string[]).includes(p.name);
@@ -87,8 +89,16 @@ function pickColorExcluding(palette: readonly string[], exclude: readonly string
   return pick(rng, options);
 }
 
+function tryPickColorExcluding(palette: readonly string[], exclude: readonly string[], rng: Rng): string | null {
+  try { return pickColorExcluding(palette, exclude, rng); } catch { return null; }
+}
+
 function weightsFromConfig(cfg: Config): Record<string, number> {
   return Object.fromEntries(Object.entries(cfg.shapes).map(([k, v]) => [k, v.weight]));
+}
+
+function findPrimitive(name: string): Primitive | null {
+  return allPrimitives().find((p) => p.name === name) ?? null;
 }
 
 export interface ComposeContext {
@@ -117,13 +127,13 @@ export function pickStrategy(cfg: Config, rng: Rng): Strategy {
   return "single";
 }
 
-function pickHero(ctx: ComposeContext): { prim: Primitive; fg: string } | null {
+function pickHero(ctx: ComposeContext, exclude: readonly string[] = ctx.bgColors): { prim: Primitive; fg: string } | null {
   const heroCandidates = allPrimitives().filter((p) => !isAccent(p));
   const weights = weightsFromConfig(ctx.cfg);
   const active = heroCandidates.filter((p) => (weights[p.name] ?? 0) > 0);
   if (active.length === 0) return null;
   const prim = sampleByWeight(heroCandidates, weights, ctx.rng);
-  const fg = pickColorExcluding(ctx.cfg.palette, ctx.bgColors, ctx.rng);
+  const fg = pickColorExcluding(ctx.cfg.palette, exclude, ctx.rng);
   return { prim, fg };
 }
 
@@ -151,12 +161,7 @@ function composeHeroAccent(ctx: ComposeContext): ComposeResult {
     const accentBox = anchorBbox(aanchor, ACCENT_SCALE);
     const onTopOfHero = rectContains(heroBox, accentBox);
     const exclude = onTopOfHero ? [hero.fg] : ctx.bgColors;
-    let afg: string;
-    try {
-      afg = pickColorExcluding(ctx.cfg.palette, exclude, ctx.rng);
-    } catch {
-      afg = hero.fg;
-    }
+    const afg = tryPickColorExcluding(ctx.cfg.palette, exclude, ctx.rng) ?? hero.fg;
     const raw = ap.render({ fg: afg, bg: ctx.primaryBg, rng: ctx.rng, padding: ctx.cfg.padding });
     accentParts.push(placeAccent(raw, aanchor));
   }
@@ -168,21 +173,30 @@ function composeHeroAccent(ctx: ComposeContext): ComposeResult {
   };
 }
 
-function composeSymmetry(
+interface SymmetryRender {
+  inner: string;
+  fg: string;
+}
+
+function renderSymmetry(
   ctx: ComposeContext,
-  strategy: "four-corner" | "opposite-pair",
-): ComposeResult {
+  strategy: SymmetryStrategy,
+  excludeColors: readonly string[],
+): SymmetryRender | null {
   const candidates = allPrimitives().filter(isSymmetry);
   const weights = weightsFromConfig(ctx.cfg);
   const active = candidates.filter((p) => (weights[p.name] ?? 0) > 0);
-  if (active.length === 0) return composeSingle(ctx);
+  if (active.length === 0) return null;
 
   const prim = sampleByWeight(candidates, weights, ctx.rng);
-  const fg = pickColorExcluding(ctx.cfg.palette, ctx.bgColors, ctx.rng);
-  const raw = prim.render({ fg, bg: ctx.primaryBg, rng: ctx.rng, padding: ctx.cfg.padding });
+  const fg = tryPickColorExcluding(ctx.cfg.palette, excludeColors, ctx.rng);
+  if (!fg) return null;
 
   let placements: [number, number, number][];
   let scale = SYMMETRY_SCALE;
+  let popIdx = -1;
+  let popColor: string | null = null;
+
   if (strategy === "four-corner") {
     const facingOut = ctx.rng() < 0.5;
     if (facingOut) {
@@ -191,6 +205,10 @@ function composeSymmetry(
       scale = SYMMETRY_SCALE * 0.9;
       const off = Math.round(100 * (1 - scale));
       placements = [[0, 0, 0], [off, 0, 0], [off, off, 0], [0, off, 0]];
+      if (ctx.rng() < COLOR_POP_PROBABILITY) {
+        popColor = tryPickColorExcluding(ctx.cfg.palette, [...excludeColors, fg], ctx.rng);
+        if (popColor) popIdx = Math.floor(ctx.rng() * placements.length);
+      }
     }
   } else {
     const diag1 = ctx.rng() < 0.5;
@@ -198,8 +216,57 @@ function composeSymmetry(
       ? [[0, 0, 0], [100, 100, 180]]
       : [[100, 0, 90], [0, 100, 270]];
   }
-  const inner = placements.map(([cx, cy, rot]) => placeAtCorner(raw, cx, cy, scale, rot)).join("");
-  return { inner, strategy, primaryFg: fg, acceptsDecorations: false };
+
+  const inner = placements.map(([cx, cy, rot], i) => {
+    const color = (i === popIdx && popColor) ? popColor : fg;
+    const raw = prim.render({ fg: color, bg: ctx.primaryBg, rng: ctx.rng, padding: ctx.cfg.padding });
+    return placeAtCorner(raw, cx, cy, scale, rot);
+  }).join("");
+
+  return { inner, fg };
+}
+
+function composeSymmetry(ctx: ComposeContext, strategy: SymmetryStrategy): ComposeResult {
+  const result = renderSymmetry(ctx, strategy, ctx.bgColors);
+  if (!result) return composeSingle(ctx);
+  return { inner: result.inner, strategy, primaryFg: result.fg, acceptsDecorations: false };
+}
+
+function composeLayered(ctx: ComposeContext): ComposeResult {
+  const backdrop = findPrimitive("circle");
+  if (!backdrop) return composeSingle(ctx);
+  const weights = weightsFromConfig(ctx.cfg);
+  if ((weights["circle"] ?? 0) <= 0) return composeSingle(ctx);
+
+  const bdColor = tryPickColorExcluding(ctx.cfg.palette, ctx.bgColors, ctx.rng);
+  if (!bdColor) return composeSingle(ctx);
+  const bdInner = backdrop.render({ fg: bdColor, bg: ctx.primaryBg, rng: ctx.rng, padding: ctx.cfg.padding });
+
+  const subModes = ["four-corner", "opposite-pair", "halfCircle"] as const;
+  const sub = pick(ctx.rng, subModes);
+  const exclude = [...ctx.bgColors, bdColor];
+
+  let fgInner = "";
+  if (sub === "four-corner" || sub === "opposite-pair") {
+    const result = renderSymmetry(ctx, sub, exclude);
+    if (!result) return { inner: bdInner, strategy: "layered", primaryFg: bdColor, acceptsDecorations: false };
+    fgInner = result.inner;
+  } else {
+    const hc = findPrimitive("halfCircle");
+    if (hc && (weights["halfCircle"] ?? 0) > 0) {
+      const fgColor = tryPickColorExcluding(ctx.cfg.palette, exclude, ctx.rng);
+      if (fgColor) {
+        fgInner = hc.render({ fg: fgColor, bg: ctx.primaryBg, rng: ctx.rng, padding: ctx.cfg.padding });
+      }
+    }
+  }
+
+  return {
+    inner: bdInner + fgInner,
+    strategy: "layered",
+    primaryFg: bdColor,
+    acceptsDecorations: false,
+  };
 }
 
 export function compose(ctx: ComposeContext): ComposeResult {
@@ -209,6 +276,7 @@ export function compose(ctx: ComposeContext): ComposeResult {
     case "hero-accent": return composeHeroAccent(ctx);
     case "four-corner": return composeSymmetry(ctx, "four-corner");
     case "opposite-pair": return composeSymmetry(ctx, "opposite-pair");
+    case "layered": return composeLayered(ctx);
   }
 }
 

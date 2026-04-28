@@ -50,6 +50,7 @@ const CompositionSchema = z.object({
     "hero-accent": z.number().min(0),
     "four-corner": z.number().min(0),
     "opposite-pair": z.number().min(0),
+    "layered": z.number().min(0),
   }),
 });
 
@@ -109,6 +110,7 @@ export const defaultConfig: Config = {
       "hero-accent": 2,
       "four-corner": 1,
       "opposite-pair": 1,
+      "layered": 1.5,
     },
   },
 };

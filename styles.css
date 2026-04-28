@@ -7,6 +7,10 @@ body { display: grid; grid-template-columns: 320px 1fr; }
 #controls input[type=number], #controls select { width: 100%; padding: 4px 6px; background: #222; color: #eee; border: 1px solid #333; }
 #controls fieldset { border: 1px solid #333; margin: 12px 0; padding: 8px; }
 #controls legend { font-size: 12px; text-transform: uppercase; color: #aaa; }
+#controls details.group { border: 1px solid #333; margin: 12px 0; padding: 0 8px; }
+#controls details.group > summary { font-size: 12px; text-transform: uppercase; color: #aaa; cursor: pointer; padding: 8px 0; user-select: none; }
+#controls details.group[open] { padding: 0 8px 8px; }
+#controls details.group[open] > summary { border-bottom: 1px solid #2a2a2a; margin-bottom: 8px; }
 #controls .row { display: flex; gap: 6px; align-items: center; }
 #controls button { padding: 6px 10px; background: #333; color: #eee; border: 1px solid #444; cursor: pointer; }
 #controls button:hover { background: #444; }

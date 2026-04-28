@@ -187,23 +187,6 @@ async function downloadZip() {
   downloadBlob(blob, `tiles-${Date.now()}.zip`);
 }
 
-function downloadHtml() {
-  if (lastTiles.length === 0) { alert("Generate tiles first."); return; }
-  const items = lastTiles.map((t) =>
-    `<figure><div class="tile">${t.svg}</div><figcaption>seed ${t.seed}</figcaption></figure>`
-  ).join("");
-  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Abstract Art Tiles</title>
-<style>
-body{margin:0;background:#111;color:#eee;font-family:system-ui,sans-serif;padding:24px;}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
-figure{margin:0;background:#000;padding:8px;border:1px solid #222;}
-.tile svg{width:100%;height:auto;display:block;}
-figcaption{margin-top:8px;font-size:12px;color:#888;}
-</style></head><body><h1>Tiles</h1><div class="grid">${items}</div></body></html>`;
-  const blob = new Blob([html], { type: "text/html" });
-  downloadBlob(blob, `tiles-${Date.now()}.html`);
-}
-
 function renderPreview(tiles) {
   const box = el("preview");
   box.innerHTML = "";
@@ -246,7 +229,6 @@ el("add-color").onclick = () => { state.palette.push("#888888"); renderPalette()
 el("randomize").onclick = () => { el("seed").value = ""; };
 el("generate").onclick = generate;
 el("download-zip").onclick = downloadZip;
-el("download-html").onclick = downloadHtml;
 
 syncFormFromState();
 loadPresets();

@@ -272,7 +272,7 @@ function composeLayered(ctx: ComposeContext): ComposeResult {
   }
 
   return {
-    inner: bdInner + fgInner,
+    inner: withTilePadding(bdInner + fgInner, TILE_PADDING),
     strategy: "layered",
     primaryFg: bdColor,
     acceptsDecorations: false,

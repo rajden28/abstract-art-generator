@@ -24,7 +24,7 @@ const SYMMETRY_NAMES = ["leaf"] as const;
 const ACCENT_SCALE = 0.15;
 const SYMMETRY_SCALE = 0.5;
 const COLOR_POP_PROBABILITY = 0.35;
-const TILE_PADDING = 6;
+const TILE_PADDING = 4;
 const PADDED_HERO_NAMES = new Set(["circle", "halfCircle"]);
 
 const isAccent = (p: Primitive) => (ACCENT_NAMES as readonly string[]).includes(p.name);

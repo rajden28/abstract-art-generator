@@ -144,10 +144,16 @@ function pickHero(ctx: ComposeContext, exclude: readonly string[] = ctx.bgColors
   return { prim, fg };
 }
 
+function pickHeroAccent(ctx: ComposeContext, hero: { prim: Primitive; fg: string }): string | undefined {
+  if (hero.prim.name !== "concentricBands") return undefined;
+  return tryPickColorExcluding(ctx.cfg.palette, [...ctx.bgColors, hero.fg], ctx.rng) ?? undefined;
+}
+
 function composeSingle(ctx: ComposeContext): ComposeResult {
   const hero = pickHero(ctx);
   if (!hero) throw new Error("No hero primitive available (all weights zero or only accent shapes enabled)");
-  let inner = hero.prim.render({ fg: hero.fg, bg: ctx.primaryBg, rng: ctx.rng, padding: ctx.cfg.padding });
+  const accent = pickHeroAccent(ctx, hero);
+  let inner = hero.prim.render({ fg: hero.fg, bg: ctx.primaryBg, rng: ctx.rng, padding: ctx.cfg.padding, accent });
   if (PADDED_HERO_NAMES.has(hero.prim.name)) inner = withTilePadding(inner, TILE_PADDING);
   return { inner, strategy: "single", primaryFg: hero.fg };
 }
@@ -155,7 +161,8 @@ function composeSingle(ctx: ComposeContext): ComposeResult {
 function composeHeroAccent(ctx: ComposeContext): ComposeResult {
   const hero = pickHero(ctx);
   if (!hero) return composeSingle(ctx);
-  const heroInner = hero.prim.render({ fg: hero.fg, bg: ctx.primaryBg, rng: ctx.rng, padding: ctx.cfg.padding });
+  const heroAccent = pickHeroAccent(ctx, hero);
+  const heroInner = hero.prim.render({ fg: hero.fg, bg: ctx.primaryBg, rng: ctx.rng, padding: ctx.cfg.padding, accent: heroAccent });
 
   const shapeWeights = weightsFromConfig(ctx.cfg);
   const accentPrims = allPrimitives().filter((p) => isAccent(p) && (shapeWeights[p.name] ?? 0) > 0);

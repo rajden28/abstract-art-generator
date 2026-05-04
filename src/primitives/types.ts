@@ -5,6 +5,7 @@ export interface RenderContext {
   bg: string;
   rng: Rng;
   padding: number;
+  accent?: string;
 }
 
 export interface Primitive {

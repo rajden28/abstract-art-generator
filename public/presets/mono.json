@@ -1,6 +1,5 @@
 {
   "palette": ["#F2F2F2", "#1A1A1A"],
   "background": "#F2F2F2",
-  "rotation": "random",
-  "padding": 4
+  "rotation": "random"
 }

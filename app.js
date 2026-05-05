@@ -113,11 +113,34 @@ function syncFormFromState() {
     const valSpan = document.querySelector(`.comp-val[data-key="${key}"]`);
     if (valSpan) valSpan.textContent = s.value;
   });
+  syncBackgroundFromState();
+}
+
+function syncBackgroundFromState() {
+  const bg = state.background;
+  const presetModes = ["auto", "split-h", "split-v", "random"];
+  const fixedRow = el("bg-fixed-row");
+  const fixedRadio = fixedRow.querySelector('input[type="radio"]');
+  const fixedVal = el("bg-fixed-val");
+  if (typeof bg === "string" && bg.startsWith("#")) {
+    fixedRow.hidden = false;
+    fixedVal.textContent = bg;
+    fixedRadio.dataset.hex = bg;
+    fixedRadio.checked = true;
+  } else {
+    fixedRow.hidden = true;
+    fixedRadio.checked = false;
+    delete fixedRadio.dataset.hex;
+    const radio = document.querySelector(`input[name="bg"][value="${presetModes.includes(bg) ? bg : "auto"}"]`);
+    if (radio) radio.checked = true;
+  }
 }
 
 function readBackground() {
   const sel = document.querySelector('input[name="bg"]:checked');
-  return sel ? sel.value : "auto";
+  if (!sel) return "auto";
+  if (sel.value === "fixed") return sel.dataset.hex ?? "auto";
+  return sel.value;
 }
 
 function readComposition() {

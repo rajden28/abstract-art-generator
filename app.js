@@ -95,9 +95,15 @@ function loadPresets() {
   sel.onchange = () => {
     if (!sel.value) return;
     const preset = PRESETS[sel.value];
-    Object.assign(state, { ...DEFAULT_CFG, ...preset,
-      shapes: { ...DEFAULT_CFG.shapes, ...(preset.shapes || {}) },
-    });
+    for (const [k, v] of Object.entries(preset)) {
+      if (k === "shapes") {
+        state.shapes = { ...state.shapes, ...v };
+      } else if (k === "palette") {
+        state.palette = [...v];
+      } else {
+        state[k] = v;
+      }
+    }
     syncFormFromState();
   };
 }

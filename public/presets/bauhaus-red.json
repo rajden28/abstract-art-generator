@@ -1,6 +1,3 @@
 {
-  "palette": ["#C4402E", "#1A1A1A", "#E8D4A8"],
-  "background": "auto",
-  "rotation": "random",
-  "padding": 0
+  "palette": ["#C4402E", "#1A1A1A", "#E8D4A8"]
 }
